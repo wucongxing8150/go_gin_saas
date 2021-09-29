@@ -1,0 +1,13 @@
+{
+  "port": 9500,
+  "database":{
+    "Host": "localhost",
+    "UserName": "root",
+    "Password": "Wucongxing1..",
+    "Port": 3306,
+    "Database":"test",
+    "MaxIdleCons":5,
+    "MaxOpenCons":20,
+    "Debug": true
+  }
+}
