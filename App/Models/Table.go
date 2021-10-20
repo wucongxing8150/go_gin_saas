@@ -1,7 +1,7 @@
 package Models
 
 import (
-	"go/Cores/mysql"
+	"go/Config/mysql"
 	"time"
 )
 var db = mysql.DB
@@ -30,7 +30,7 @@ func GetTotal(maps interface {}) (count int){
 	return
 }
 func Add(Data map[string]interface{}) bool{
-	table := Table {
+	table := Table{
 		UserName : Data["user_name"].(string),
 		UserPhone : Data["user_phone"].(string),
 	}

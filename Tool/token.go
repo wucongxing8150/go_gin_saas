@@ -3,17 +3,18 @@ package Tool
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
+	"github.com/spf13/viper"
 	"time"
 )
 
 // 一些常量
 var (
-	TokenExpired     string = "token过期"
-	TokenMalformed   string = "token解析错误" //非token数据
-	TokenInvalid     string = "无法解析token"
-	TokenNotValidYet string = "token签名错误"
-	TokenEmpty       string = "token解析错误"
-	SignKey          string = "123456"
+	TokenExpired     = "token过期"
+	TokenMalformed   = "token解析错误" //非token数据
+	TokenInvalid     = "无法解析token"
+	TokenNotValidYet = "token签名错误"
+	TokenEmpty       = "token解析错误"
+	SignKey          = viper.GetString("tokenKey")
 )
 
 type JWT struct {
@@ -42,11 +43,6 @@ type JwtAccessData struct {
 type JwtRefreshData struct {
 	User
 	jwt.StandardClaims
-}
-
-// 获取signKey
-func GetSignKey() string {
-	return SignKey
 }
 
 // 生成access-token
@@ -96,42 +92,45 @@ func (u User) CreateRefreshToken() string {
 	return result
 }
 
-func ParseToken(tokenString string) map[string]string {
-	//定义返回值
-	result := &person{
-		name: "pprof.cn",
-		city: "北京",
-		age:  18,
-	}
+//解析token
+func ParseToken(tokenString string) (message string, code int) {
 
+	//解析、验证并返回令牌
 	j := new(JWT)
-	token, err := jwt.ParseWithClaims(tokenString, &JwtRefreshData{}, func(token *jwt.Token) (interface{}, error) {
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// alg:加密方式
+		// HS256：一种对称加密算法，使用同一个秘钥对signature加密解密
+		// RS256：一种非对称加密算法，使用私钥加密，公钥解密
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
 		return j.SigningKey, nil
 	})
 
+	/*token, err := jwt.ParseWithClaims(tokenString, &JwtRefreshData{}, func(token *jwt.Token) (interface{}, error) {
+		return j.SigningKey, nil
+	})*/
+
 	if token == nil {
-		result["msg"] = TokenEmpty
-		return result
+		return TokenEmpty, 0
 	}
+
 	if err != nil {
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
-				result["code"] 	= "0"
-				result["msg"] = TokenMalformed
-				return result
+				return TokenMalformed, 0
+
 			} else if ve.Errors&jwt.ValidationErrorExpired != 0 {
 				// Token is expired
-				result["code"] = "-1"
-				result["msg"] = TokenExpired
-				return result
+				return TokenExpired, -1
+
 			} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
-				result["code"] = "0"
-				result["msg"] = TokenNotValidYet
-				return result
+				return TokenNotValidYet, 0
+
 			} else {
-				result["code"] = "0"
-				result["msg"] = TokenInvalid
-				return result
+				return TokenInvalid, 0
 			}
 		}
 	}
@@ -139,7 +138,5 @@ func ParseToken(tokenString string) map[string]string {
 		fmt.Println("nihao")
 		fmt.Println(result)
 	}
-	result["code"] = "0"
-	result["msg"] = TokenInvalid
-	return result
+	return TokenInvalid, 0
 }

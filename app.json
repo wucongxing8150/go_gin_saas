@@ -9,5 +9,6 @@
     "MaxIdleCons":5,
     "MaxOpenCons":20,
     "Debug": true
-  }
+  },
+  "tokenKey": "123456"
 }

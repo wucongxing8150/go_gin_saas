@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go/Tool"
+	"go/Tool/response"
 	"net/http"
 	"time"
 )
@@ -19,15 +20,35 @@ func GetTest(c *gin.Context)  {
 	fmt.Println(user)
 	fmt.Println(token)*/
 
-	//解析token
-	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX2lkIjoiMSIsInVzZXJfaWQiOiIyIiwic3RvcmVfaWRzIjoiIiwic3RhdGlvbl9pZHMiOiIiLCJlbnRlcnByaXNlX2lkIjoiIiwidmVuZGVyX2lkcyI6bnVsbCwidXNlcl9sb2dpbl9pcCI6IiIsInVuaXF1ZV9kZXZpY2VfY29kZV90YiI6IiIsInVuaXF1ZV9kZXZpY2VfY29kZV90bSI6IiIsInVuaXF1ZV9kZXZpY2VfY29kZV9wZGQiOiIiLCJhdWQiOiJ1c2VyIiwiZXhwIjoxNjMwNTYwNzE2LCJpYXQiOjE2MzA0NzQzMTYsImlzcyI6InN5c3RlbSIsIm5iZiI6MTYzMDQ3NDMxNn0.0y0cwT3bN1uD0nhMfhccBe3x3pW08RzZl76zPvAx2OU"
+	tool := response.Gin{Ctx: c}
+	tool.HttpReturn(1, "success", nil)
+	return
 
-	var result = Tool.ParseToken(token)
+	//解析token
+	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX2lkIjoiMSIsInVzZXJfaWQiOiIyIiwic3RvcmVfaWRzIjoiIiwic3RhdGlvbl9pZHMiOiIiLCJlbnRlcnByaXNlX2lkIjoiIiwidmVuZGVyX2lkcyI6bnVsbCwidXNlcl9sb2dpbl9pcCI6IiIsInVuaXF1ZV9kZXZpY2VfY29kZV90YiI6IiIsInVuaXF1ZV9kZXZpY2VfY29kZV90bSI6IiIsInVuaXF1ZV9kZXZpY2VfY29kZV9wZGQiOiIiLCJhdWQiOiJ1c2VyIiwiZXhwIjoxNjM0NjMwNTE5LCJpYXQiOjE2MzQ1NDQxMTksImlzcyI6InN5c3RlbSIsIm5iZiI6MTYzNDU0NDExOX0.6pxv966Ws5UGrQLOk3flHnLOe59yOzM4AzEjDWXHvDk"
+	message, code := Tool.ParseToken(token)
+
+	//生成token
+	/*data := &Tool.User{
+		AuthId : "123",
+		UserId : "123456",
+		StoreIds : "123456",
+		StationIds : "123456",
+		EnterpriseId : "123456",
+		VenderIds : []string{"123456"},
+		UserLoginIp : "123456",
+		UniqueDeviceCodeTb : "123456",
+		UniqueDeviceCodeTm : "123456",
+		UniqueDeviceCodePdd : "123456",
+	}*/
+
+	//token := Tool.CreateRefreshToken(data)
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": "success",
-		"status":  1,
+		"message": message,
+		"status":  code,
 		"error":   "",
-		"data":    result,
+		"data":    "",
 	})
 
 	/*config := &mysql.Config{}
